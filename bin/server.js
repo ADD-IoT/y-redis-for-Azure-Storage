@@ -7,11 +7,17 @@ import * as server from '../src/server.js'
 const port = number.parseInt(env.getConf('port') || '3002')
 const redisPrefix = env.getConf('redis-prefix') || 'y'
 const postgresUrl = env.getConf('postgres')
+const azureEndpoint = env.getConf('azure-account-name')
 const s3Endpoint = env.getConf('s3-endpoint')
 const checkPermCallbackUrl = env.ensureConf('AUTH_PERM_CALLBACK')
 
 let store
-if (s3Endpoint) {
+if (azureEndpoint) {
+  console.log('using createazureblobStorage store')
+  const { createazureblobStorage } = await import('../src/storage/azureblob.js')
+  const bucketName = 'ydocs'
+  store = createazureblobStorage(bucketName)
+} else if (s3Endpoint) {
   console.log('using s3 store')
   const { createS3Storage } = await import('../src/storage/s3.js')
   const bucketName = 'ydocs'

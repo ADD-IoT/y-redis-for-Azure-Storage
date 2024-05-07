@@ -65,6 +65,7 @@
     "yjs": "^13.5.6"
   },
   "optionalDependencies": {
+    "@azure/storage-blob": "^12.17.0",
     "postgres": "^3.4.3",
     "minio": "^7.1.3"
   },

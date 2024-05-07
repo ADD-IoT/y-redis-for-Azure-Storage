@@ -5,10 +5,16 @@ import * as api from '../src/api.js'
 
 const redisPrefix = env.getConf('redis-prefix') || 'y'
 const postgresUrl = env.getConf('postgres')
+const azureEndpoint = env.getConf('azure-account-name')
 const s3Endpoint = env.getConf('s3-endpoint')
 
 let store
-if (s3Endpoint) {
+if (azureEndpoint) {
+  console.log('using azure store')
+  const { createazureblobStorage } = await import('../src/storage/azureblob.js')
+  const bucketName = 'ydocs'
+  store = createazureblobStorage(bucketName)
+} else if (s3Endpoint) {
   console.log('using s3 store')
   const { createS3Storage } = await import('../src/storage/s3.js')
   const bucketName = 'ydocs'
@@ -17,7 +23,7 @@ if (s3Endpoint) {
     // make sure the bucket exists
     await store.client.makeBucket(bucketName)
   } catch (e) {}
-} else if (postgresUrl) {
+}else if (postgresUrl) {
   console.log('using postgres store')
   const { createPostgresStorage } = await import('../src/storage/postgres.js')
   store = await createPostgresStorage()
